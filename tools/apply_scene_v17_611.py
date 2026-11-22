@@ -41,12 +41,18 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
         raise ValueError(f"V17.611 expected the three reported beams; found {sorted(found_beams)}")
     items = [item for item in items if item.get("id") not in floating_beams]
 
-    # Replace the old potted plant in the selected glazed bay with the lift.
-    lift_x, lift_z = 13.0, -10.0
+    # Replace the selected potted plant with the lift, using the plant's
+    # measured footprint as the anchor instead of a guessed world coordinate.
     plants = [item for item in items
               if item.get("id", "").startswith("v601_indoor_plant_4_")]
     if len(plants) < 3:
-        raise ValueError(f"V17.611 expected the plant group in the lift bay; found {len(plants)} parts")
+        raise ValueError(f"V17.612 expected the target plant group; found {len(plants)} parts")
+    plant_x = sorted(float(item["position"][0]) for item in plants if len(item.get("position", [])) == 3)
+    plant_z = sorted(float(item["position"][2]) for item in plants if len(item.get("position", [])) == 3)
+    if len(plant_x) < 3 or len(plant_z) < 3:
+        raise ValueError("V17.612 target plant has no usable spatial anchor")
+    lift_x = round(plant_x[len(plant_x) // 2], 3)
+    lift_z = round(plant_z[len(plant_z) // 2], 3)
     items = [item for item in items if item not in plants]
 
     # Replace the floating upper landing slab with four pieces around a 3.6 x
@@ -58,10 +64,10 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
     slab_material = old_landing[0].get("material", "v439_gallery_warm")
     slab_parent = "Interieur/Galeries/Plancher niveau 2 autour ascenseur"
     for ident, pos, size in (
-        ("v611_landing_slab_left", [-8.63, 9.164, -9.45], [39.66, 0.045, 8.42]),
-        ("v611_landing_slab_right", [21.63, 9.164, -9.45], [13.66, 0.045, 8.42]),
-        ("v611_landing_slab_inner", [13.0, 9.164, -12.68], [3.60, 0.045, 1.96]),
-        ("v611_landing_slab_facade", [13.0, 9.164, -6.77], [3.60, 0.045, 3.06]),
+        ("v611_landing_slab_left", [lift_x - 21.63, 9.164, lift_z + 0.55], [39.66, 0.045, 8.42]),
+        ("v611_landing_slab_right", [lift_x + 8.63, 9.164, lift_z + 0.55], [13.66, 0.045, 8.42]),
+        ("v611_landing_slab_inner", [lift_x, 9.164, lift_z - 2.68], [3.60, 0.045, 1.96]),
+        ("v611_landing_slab_facade", [lift_x, 9.164, lift_z + 3.23], [3.60, 0.045, 3.06]),
     ):
         items.append({"id": ident, "parent": slab_parent, "geometry": "unit_box",
                       "material": slab_material, "position": pos, "size": size, "rotationY": 0})
@@ -77,62 +83,95 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
          "position": [-35.0, 13.664, -30.0], "size": [3.18, 0.045, 48.9], "rotationY": 0},
     ])
 
-    # Space-Age capsule: brushed-aluminum uprights and rounded ring details,
-    # translucent glazing, and split inner-facing doors. The shaft stops at
-    # level two; no opening is retained above it.
-    base_y, top_y = 0.60, 11.20
+    # Replace the squared cage with a rounded, faceted Space-Age capsule.
+    # The shaft stays inside the floor opening and stops at level two.
+    base_y, top_y = 0.64, 11.16
     shaft_h = top_y - base_y
-    half_x, half_z = 1.78, 1.63
-    metal, glass = "prp_roof_metal", "prp_window_glass"
-    lift_parent = "Interieur/Hall/Ascenseur capsule alu et verre années 60"
-    def box(ident: str, material: str, pos: list[float], size: list[float], parent: str = lift_parent) -> None:
-        items.append({"id": ident, "parent": parent, "geometry": "unit_box", "material": material,
-                      "position": pos, "size": size, "rotationY": 0})
+    shaft_mid = (base_y + top_y) / 2.0
+    outer_rx, outer_rz, facets = 1.72, 1.58, 12
+    glass, aluminum, accent = "prp_window_glass", "v439_gallery_warm", "prp_roof_metal"
+    lift_parent = "Interieur/Hall/Ascenseur capsule Space Age alu champagne et verre"
 
-    # Shaft frame and glazed sides. The inner side is deliberately left open
-    # except for two retracted glass door leaves at each landing.
-    for ix, dx in enumerate((-half_x, half_x)):
-        for iz, dz in enumerate((-half_z, half_z)):
-            box(f"v611_shaft_post_{ix}_{iz}", metal,
-                [lift_x + dx, (base_y + top_y) / 2, lift_z + dz], [0.16, shaft_h, 0.16])
-    for y, tag in ((base_y + 0.12, "sill"), (top_y - 0.12, "crown")):
-        box(f"v611_shaft_ring_x0_{tag}", metal, [lift_x, y, lift_z - half_z], [3.56, 0.18, 0.16])
-        box(f"v611_shaft_ring_x1_{tag}", metal, [lift_x, y, lift_z + half_z], [3.56, 0.18, 0.16])
-        box(f"v611_shaft_ring_z0_{tag}", metal, [lift_x - half_x, y, lift_z], [0.16, 0.18, 3.26])
-        box(f"v611_shaft_ring_z1_{tag}", metal, [lift_x + half_x, y, lift_z], [0.16, 0.18, 3.26])
-    box("v611_shaft_glass_front", glass, [lift_x, (base_y + top_y) / 2, lift_z + half_z],
-        [3.36, shaft_h - 0.35, 0.055])
-    for side, x in (("left", lift_x - half_x), ("right", lift_x + half_x)):
-        box(f"v611_shaft_glass_{side}", glass, [x, (base_y + top_y) / 2, lift_z],
-            [0.055, shaft_h - 0.35, 3.06])
-    # Inner-facing glazed door leaves are held aside, leaving a clear opening.
-    for level, y in (("ground", 1.75), ("second", 10.10)):
-        for side, dx in (("left", -1.15), ("right", 1.15)):
-            box(f"v611_landing_door_{level}_{side}", glass, [lift_x + dx, y, lift_z - half_z],
-                [0.86, 2.15, 0.045])
-            box(f"v611_landing_door_trim_{level}_{side}", metal,
-                [lift_x + dx, y, lift_z - half_z - 0.035], [0.045, 2.15, 0.045])
+    def add_box(ident: str, material: str, pos: list[float], size: list[float], yaw: float = 0.0) -> None:
+        items.append({"id": ident, "parent": lift_parent, "geometry": "unit_box",
+                      "material": material, "position": pos, "size": size, "rotationY": yaw})
 
-    # Ground-floor capsule cab, with rounded, polished-metal edge beads.
-    cab_y, cab_h, cab_w, cab_d = 1.82, 2.42, 2.08, 2.18
-    items.append({"id": "v611_cab_floor", "parent": lift_parent, "geometry": "unit_sphere",
-                  "material": metal, "position": [lift_x, 0.70, lift_z],
-                  "size": [2.24, 0.15, 2.36], "rotationY": 0})
-    box("v611_cab_glass_front", glass, [lift_x, cab_y, lift_z + cab_d / 2],
-        [cab_w - 0.18, cab_h, 0.045])
-    for side, x in (("left", lift_x - cab_w / 2), ("right", lift_x + cab_w / 2)):
-        box(f"v611_cab_glass_{side}", glass, [x, cab_y, lift_z], [0.045, cab_h, cab_d - 0.18])
-        box(f"v611_cab_post_{side}", metal, [x, cab_y, lift_z - cab_d / 2], [0.08, cab_h + 0.14, 0.08])
-    items.append({"id": "v611_cab_midband", "parent": lift_parent, "geometry": "unit_sphere",
-                  "material": metal, "position": [lift_x, 2.82, lift_z],
-                  "size": [2.30, 0.08, 2.40], "rotationY": 0})
-    items.append({"id": "v611_cab_crown", "parent": lift_parent, "geometry": "unit_sphere",
-                  "material": metal, "position": [lift_x, 3.12, lift_z],
-                  "size": [2.20, 0.22, 2.30], "rotationY": 0})
-    # A low amber interior light gives the aluminum/glass capsule a restrained
-    # 1960s instrument-panel accent without adding another emissive mesh type.
-    for i, dx in enumerate((-0.60, 0.60), 1):
-        box(f"v611_cab_light_{i}", "lamp", [lift_x + dx, 2.94, lift_z - 0.72], [0.10, 0.05, 0.06])
+    def ellipse_point(i: int, count: int, rx: float, rz: float) -> tuple[float, float]:
+        angle = 2.0 * math.pi * i / count
+        return lift_x + rx * math.cos(angle), lift_z + rz * math.sin(angle)
+
+    def add_ring(tag: str, y: float, rx: float, rz: float, count: int, height: float, material: str) -> None:
+        for i in range(count):
+            x0, z0 = ellipse_point(i, count, rx, rz)
+            x1, z1 = ellipse_point((i + 1) % count, count, rx, rz)
+            dx, dz = x1 - x0, z1 - z0
+            yaw = math.degrees(math.atan2(-dz, dx))
+            add_box(f"v612_{tag}_{i:02d}", material,
+                    [(x0 + x1) / 2.0, y, (z0 + z1) / 2.0],
+                    [math.hypot(dx, dz) + 0.03, height, 0.13], yaw)
+
+    # Rounded 12-sided tower, with glass facets and narrow champagne-aluminum uprights.
+    for i in range(facets):
+        x, z = ellipse_point(i, facets, outer_rx, outer_rz)
+        add_box(f"v612_shaft_post_{i:02d}", aluminum,
+                [x, shaft_mid, z], [0.12, shaft_h - 0.18, 0.12])
+    for i in range(facets):
+        x0, z0 = ellipse_point(i, facets, outer_rx, outer_rz)
+        x1, z1 = ellipse_point((i + 1) % facets, facets, outer_rx, outer_rz)
+        cx, cz = (x0 + x1) / 2.0, (z0 + z1) / 2.0
+        # Inner entrance faces -Z; keep that facet open for the landing doors.
+        if cz < lift_z - 1.25 and abs(cx - lift_x) < 0.48:
+            continue
+        dx, dz = x1 - x0, z1 - z0
+        yaw = math.degrees(math.atan2(-dz, dx))
+        add_box(f"v612_shaft_glass_{i:02d}", glass,
+                [cx, shaft_mid, cz], [math.hypot(dx, dz) - 0.12, shaft_h - 0.42, 0.045], yaw)
+    add_ring("shaft_sill", base_y + 0.07, outer_rx, outer_rz, facets, 0.16, aluminum)
+    add_ring("shaft_crown", top_y - 0.10, outer_rx, outer_rz, facets, 0.18, aluminum)
+    add_ring("shaft_belt", 5.90, outer_rx, outer_rz, facets, 0.055, accent)
+
+    # Paired glass doors face into the building at both served floors.
+    for level, y in (("ground", 1.74), ("second", 10.10)):
+        for side, dx in (("left", -0.42), ("right", 0.42)):
+            add_box(f"v612_landing_door_{level}_{side}", glass,
+                    [lift_x + dx, y, lift_z - outer_rz - 0.035], [0.86, 2.16, 0.045])
+        for side, dx in (("left", -0.87), ("right", 0.87)):
+            add_box(f"v612_landing_jamb_{level}_{side}", aluminum,
+                    [lift_x + dx, y, lift_z - outer_rz - 0.08], [0.075, 2.30, 0.10])
+        add_box(f"v612_landing_header_{level}", aluminum,
+                [lift_x, y + 1.16, lift_z - outer_rz - 0.08], [1.82, 0.09, 0.10])
+        add_box(f"v612_landing_sill_{level}", accent,
+                [lift_x, y - 1.08, lift_z - outer_rz - 0.08], [1.82, 0.045, 0.10])
+
+    # The car is a smaller oval pod at the ground stop: wraparound glazing,
+    # slender metal beads and a matching split-glass entrance.
+    cab_rx, cab_rz, cab_facets = 1.18, 1.08, 12
+    cab_bottom, cab_top = 0.72, 3.08
+    cab_y, cab_h = (cab_bottom + cab_top) / 2.0, cab_top - cab_bottom
+    for i in range(cab_facets):
+        x, z = ellipse_point(i, cab_facets, cab_rx, cab_rz)
+        add_box(f"v612_cab_post_{i:02d}", aluminum, [x, cab_y, z], [0.075, cab_h - 0.10, 0.075])
+    for i in range(cab_facets):
+        x0, z0 = ellipse_point(i, cab_facets, cab_rx, cab_rz)
+        x1, z1 = ellipse_point((i + 1) % cab_facets, cab_rx, cab_rz)
+        cx, cz = (x0 + x1) / 2.0, (z0 + z1) / 2.0
+        if cz < lift_z - 0.85 and abs(cx - lift_x) < 0.32:
+            continue
+        dx, dz = x1 - x0, z1 - z0
+        yaw = math.degrees(math.atan2(-dz, dx))
+        add_box(f"v612_cab_glass_{i:02d}", glass,
+                [cx, cab_y, cz], [math.hypot(dx, dz) - 0.09, cab_h - 0.20, 0.04], yaw)
+    add_ring("cab_base_bead", cab_bottom + 0.08, cab_rx, cab_rz, cab_facets, 0.11, aluminum)
+    add_ring("cab_mid_bead", 2.62, cab_rx, cab_rz, cab_facets, 0.09, accent)
+    add_ring("cab_crown_bead", cab_top - 0.09, cab_rx, cab_rz, cab_facets, 0.15, aluminum)
+    for side, dx in (("left", -0.31), ("right", 0.31)):
+        add_box(f"v612_cab_door_{side}", glass,
+                [lift_x + dx, 1.82, lift_z - cab_rz - 0.035], [0.64, 2.08, 0.04])
+    for side, dx in (("left", -0.67), ("right", 0.67)):
+        add_box(f"v612_cab_door_jamb_{side}", aluminum,
+                [lift_x + dx, 1.82, lift_z - cab_rz - 0.075], [0.06, 2.22, 0.08])
+    add_box("v612_cab_indicator", "lamp",
+            [lift_x, 2.87, lift_z - cab_rz - 0.08], [0.42, 0.035, 0.04])
 
     data["instances"] = items
     files[instances_path] = _json(data)
@@ -145,12 +184,14 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
         "floatingRoofBeamsRemoved": sorted(found_beams),
         "indoorPlantPartsReplaced": len(plants),
         "liftCenter": [lift_x, lift_z],
+        "liftAnchorSource": "median X/Z of the replaced indoor plant group",
+        "liftStyle": "rounded 12-facet Space-Age capsule, champagne aluminum and glass",
         "liftStops": [0.60, 9.0],
         "liftLandingDoorsFace": "building interior (-Z)",
         "secondFloorLeftRoute": "continuous at y=9.164 m",
         "thirdFloorOpening": "closed at y=13.664 m",
     }
-    files[prefix + "reports/interior-lift-v611.json"] = _json(report)
+    files[prefix + "reports/interior-lift-v612.json"] = _json(report)
 
     scene = json.loads(files[scene_path])
     scene["revision"] = revision

@@ -72,7 +72,7 @@ def main() -> None:
         from apply_scene_v17_610 import apply_patch as apply_v610
         apply_v610(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] == "V17.611":
+    if release["revision"] in ("V17.611", "V17.612"):
         from apply_scene_v17_611 import apply_patch as apply_v611
         apply_v611(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
