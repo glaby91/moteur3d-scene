@@ -128,7 +128,6 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
                 "radius": 5.0, "intensity": 1.2,
                 "color": [255, 194, 137], "group": "exterior",
             })
-    items.extend(luminaire_instances)
     instances_data["instances"] = items
     files[instances_path] = _json(instances_data)
 
