@@ -154,7 +154,7 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
         add_box(f"v612_cab_post_{i:02d}", aluminum, [x, cab_y, z], [0.075, cab_h - 0.10, 0.075])
     for i in range(cab_facets):
         x0, z0 = ellipse_point(i, cab_facets, cab_rx, cab_rz)
-        x1, z1 = ellipse_point((i + 1) % cab_facets, cab_rx, cab_rz)
+        x1, z1 = ellipse_point((i + 1) % cab_facets, cab_facets, cab_rx, cab_rz)
         cx, cz = (x0 + x1) / 2.0, (z0 + z1) / 2.0
         if cz < lift_z - 0.85 and abs(cx - lift_x) < 0.32:
             continue
