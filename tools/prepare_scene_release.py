@@ -70,6 +70,24 @@ def print_scene_inspection(files: dict[str, bytes], output: Path) -> None:
                 report["trees"].append(rec)
             elif ident.startswith("v600_garden_floor_light_"):
                 report["groundLights"].append(rec)
+    references = []
+    for name, raw in files.items():
+        for token in (b"v604_mosaic_panel_mesh", b"v604_mosaic_panel", b"v604_sunrise_mosaic"):
+            at = raw.find(token)
+            if at >= 0:
+                snippet = raw[max(0, at - 240):at + 500].decode("utf-8", errors="replace")
+                references.append({"file": name, "token": token.decode(), "snippet": snippet})
+    report["references"] = references
+    summary = {
+        "facade": report["facade"], "mosaicMaterials": report["mosaicMaterials"],
+        "trees": report["trees"], "treeReports": report["treeReports"],
+        "groundLights": report["groundLights"], "lightingFiles": report["lightingFiles"],
+        "references": report["references"],
+        "benchCounts": {key: sum(1 for x in report["bench"] if x["parent"].endswith("/" + key))
+                        for key in ("Assise", "Piétement", "V4b Dossier continu")},
+        "benchSamples": report["bench"][:4],
+    }
+    print("SCENE_INSPECTION_SUMMARY=" + json.dumps(summary, ensure_ascii=False, separators=(",", ":")))
     output.mkdir(parents=True, exist_ok=True)
     (output / "scene-inspection.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
