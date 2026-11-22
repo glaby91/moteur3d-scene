@@ -18,61 +18,61 @@ INSPECTION_TERMS = (
 )
 
 
-def print_scene_inspection(files: dict[str, bytes]) -> None:
-    """Emit scene object transforms relevant to the reported V17.606 anomalies."""
-    report: dict[str, object] = {"matchingFiles": [], "matchingInstances": []}
+def print_scene_inspection(files: dict[str, bytes], output: Path) -> None:
+    """Write a compact inspection of objects involved in the reported anomalies."""
+    wanted = ("banc ovale béton/assise", "banc ovale béton/piétement",
+              "banc ovale béton/v4b dossier continu")
+    report: dict[str, object] = {"facade": [], "bench": [], "trees": [],
+                                  "groundLights": [], "scene": {},
+                                  "treeReports": {}, "lightingFiles": {},
+                                  "mosaicMaterials": []}
     for name, raw in files.items():
-        lower_name = name.lower()
-        if any(term in lower_name for term in INSPECTION_TERMS):
-            report["matchingFiles"].append(name)
-        if not lower_name.endswith(".json") or "/instances/" not in lower_name:
+        lower = name.lower()
+        if not lower.endswith(".json"):
             continue
         try:
             data = json.loads(raw)
         except (ValueError, UnicodeDecodeError):
             continue
-        instances = data.get("instances", []) if isinstance(data, dict) else []
-        for item in instances:
+        if name == "benchmark-civic/scene.json":
+            report["scene"] = {"revision": data.get("revision"),
+                               "sceneVersion": data.get("sceneVersion"),
+                               "sectors": data.get("sectors")}
+        if name.endswith(("trees-v600-plaza.json", "trees-v601-plaza.json")):
+            report["treeReports"][name] = data
+        if name.startswith("benchmark-civic/lighting/"):
+            report["lightingFiles"][name] = data
+        if name.startswith("benchmark-civic/materials/"):
+            mats = data.get("materials", []) if isinstance(data, dict) else []
+            report["mosaicMaterials"].extend(
+                {"file": name, **m} for m in mats
+                if "mosaic" in str(m.get("id", "")).lower()
+                or "mosai" in str(m.get("id", "")).lower()
+                or str(m.get("id", "")).startswith("v604")
+            )
+        if "/instances/" not in lower or not isinstance(data, dict):
+            continue
+        for item in data.get("instances", []):
             if not isinstance(item, dict):
                 continue
-            searchable = " ".join(str(item.get(k, "")) for k in
-                                  ("id", "parent", "geometry", "material", "model")).lower()
-            if any(term in searchable for term in INSPECTION_TERMS):
-                report["matchingInstances"].append({
-                    "file": name,
-                    "id": item.get("id"),
-                    "parent": item.get("parent"),
-                    "geometry": item.get("geometry"),
-                    "material": item.get("material"),
-                    "position": item.get("position"),
-                    "size": item.get("size"),
-                    "scale": item.get("scale"),
-                    "rotation": item.get("rotation"),
-                    "rotationY": item.get("rotationY"),
-                })
-    report["sceneJson"] = json.loads(files["benchmark-civic/scene.json"])
-    report["supportingJson"] = {}
-    for name, raw in files.items():
-        if not name.endswith(".json") or name == "benchmark-civic/scene.json":
-            continue
-        if (name.endswith("trees-v600-plaza.json")
-                or name.endswith("trees-v601-plaza.json")
-                or name.endswith("scene-fix-v17.603.json")
-                or name.startswith("benchmark-civic/lighting/")):
-            try:
-                report["supportingJson"][name] = json.loads(raw)
-            except (ValueError, UnicodeDecodeError):
-                pass
-        if name.startswith("benchmark-civic/geometry/"):
-            try:
-                data = json.loads(raw)
-            except (ValueError, UnicodeDecodeError):
-                continue
-            encoded = json.dumps(data, ensure_ascii=False).lower()
-            if "v604_mosaic_panel_mesh" in encoded or "v604_facade" in encoded:
-                report["supportingJson"][name] = data
-        print("SCENE_INSPECTION_JSON=" + json.dumps(report, ensure_ascii=False, separators=(",", ":")))
-
+            ident = str(item.get("id", ""))
+            parent = str(item.get("parent", ""))
+            geom = str(item.get("geometry", ""))
+            rec = {"file": name, "id": ident, "parent": parent,
+                   "geometry": geom, "material": item.get("material"),
+                   "position": item.get("position"), "size": item.get("size"),
+                   "rotationY": item.get("rotationY")}
+            if ident.startswith("v604_facade_mosaic") or "Piliers mosaique de facade" in parent:
+                report["facade"].append(rec)
+            elif any(parent.lower().endswith(t) for t in wanted):
+                report["bench"].append(rec)
+            elif ident.startswith("v600_garden_tree_"):
+                report["trees"].append(rec)
+            elif ident.startswith("v600_garden_floor_light_"):
+                report["groundLights"].append(rec)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "scene-inspection.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -104,7 +104,7 @@ def main() -> None:
     if scene_path not in src_zip.namelist():
         raise SystemExit(f"Missing scene entry point in archive: {scene_path}")
     files = {name: src_zip.read(name) for name in src_zip.namelist()}
-    print_scene_inspection(files)
+    print_scene_inspection(files, args.output)
     scene = json.loads(files[scene_path])
     if scene.get("revision") != source["revision"]:
         raise SystemExit("base scene.json revision does not match source-archive.json")
