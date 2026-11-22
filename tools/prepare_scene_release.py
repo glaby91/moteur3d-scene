@@ -11,6 +11,46 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+INSPECTION_TERMS = (
+    "bench", "banc", "tree", "arbre", "light", "lamp", "lum", "mosaic",
+    "mosai", "facade", "façade", "beam", "poutre", "garden", "jardin",
+    "planter", "bac", "root", "racine",
+)
+
+
+def print_scene_inspection(files: dict[str, bytes]) -> None:
+    """Emit scene object transforms relevant to the reported V17.606 anomalies."""
+    report: dict[str, object] = {"matchingFiles": [], "matchingInstances": []}
+    for name, raw in files.items():
+        lower_name = name.lower()
+        if any(term in lower_name for term in INSPECTION_TERMS):
+            report["matchingFiles"].append(name)
+        if not lower_name.endswith(".json") or "/instances/" not in lower_name:
+            continue
+        try:
+            data = json.loads(raw)
+        except (ValueError, UnicodeDecodeError):
+            continue
+        instances = data.get("instances", []) if isinstance(data, dict) else []
+        for item in instances:
+            if not isinstance(item, dict):
+                continue
+            searchable = " ".join(str(item.get(k, "")) for k in
+                                  ("id", "parent", "geometry", "material", "model")).lower()
+            if any(term in searchable for term in INSPECTION_TERMS):
+                report["matchingInstances"].append({
+                    "file": name,
+                    "id": item.get("id"),
+                    "parent": item.get("parent"),
+                    "geometry": item.get("geometry"),
+                    "material": item.get("material"),
+                    "position": item.get("position"),
+                    "size": item.get("size"),
+                    "scale": item.get("scale"),
+                    "rotation": item.get("rotation"),
+                    "rotationY": item.get("rotationY"),
+                })
+    print("SCENE_INSPECTION_JSON=" + json.dumps(report, ensure_ascii=False, separators=(",", ":")))
 
 
 def main() -> None:
@@ -43,6 +83,7 @@ def main() -> None:
     if scene_path not in src_zip.namelist():
         raise SystemExit(f"Missing scene entry point in archive: {scene_path}")
     files = {name: src_zip.read(name) for name in src_zip.namelist()}
+    print_scene_inspection(files)
     scene = json.loads(files[scene_path])
     if scene.get("revision") != source["revision"]:
         raise SystemExit("base scene.json revision does not match source-archive.json")
