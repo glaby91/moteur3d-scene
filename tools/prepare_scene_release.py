@@ -52,23 +52,23 @@ def main() -> None:
     scene = json.loads(files[scene_path])
     if scene.get("revision") != source["revision"]:
         raise SystemExit("base scene.json revision does not match source-archive.json")
-    if release["revision"] in ("V17.606", "V17.607", "V17.608", "V17.609", "V17.610", "V17.611"):
+    if release["revision"] in ("V17.606", "V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613"):
         from apply_plaza_lighting_patch import apply_patch as apply_v606
         apply_v606(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.607", "V17.608", "V17.609", "V17.610", "V17.611"):
+    if release["revision"] in ("V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613"):
         from apply_scene_v17_607 import apply_patch as apply_v607
         apply_v607(files, scene_path, "V17.607")
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.608", "V17.609", "V17.610", "V17.611"):
+    if release["revision"] in ("V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613"):
         from apply_scene_v17_608 import apply_patch as apply_v608
         apply_v608(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.609", "V17.610", "V17.611"):
+    if release["revision"] in ("V17.609", "V17.610", "V17.611", "V17.612", "V17.613"):
         from apply_scene_v17_609 import apply_patch as apply_v609
         apply_v609(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.610", "V17.611"):
+    if release["revision"] in ("V17.610", "V17.611", "V17.612", "V17.613"):
         from apply_scene_v17_610 import apply_patch as apply_v610
         apply_v610(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
@@ -76,6 +76,11 @@ def main() -> None:
         from apply_scene_v17_611 import apply_patch as apply_v611
         apply_v611(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
+    if release["revision"] == "V17.613":
+        from apply_scene_v17_613 import apply_patch as apply_v613
+        apply_v613(files, scene_path, release["revision"])
+        scene = json.loads(files[scene_path])
+
     if scene.get("revision") != release["revision"]:
         raise SystemExit("Final scene.json revision does not match scene-release.json")
 
