@@ -2,7 +2,7 @@
 
 Ce dépôt contient uniquement les données de la scène civique de référence de V17 : géométrie, instances, matériaux, textures et caméras. Il ne contient aucun exécutable ni code du moteur. Les données sont conservées dans `payload/` en blocs d’archive afin que chaque fichier source reste lisible par les outils GitHub.
 
-La source de base est **V17.605**. La révision publiée **V17.606** lui ajoute les cinq luminaires très bas, alignés au centre de l'allée vers le monument du complexe aquatique. Chaque luminaire a une collerette presque affleurante, un globe diffusant qui dépasse de 4,5 cm au maximum et quatre LED en X. Les anciens points lumineux génériques dispersés sur la place sont supprimés.
+La source de base est **V17.605**. La révision publiée **V17.607** corrige la scène du complexe aquatique : les spots très bas sont déplacés autour du banc ovale et renforcés, les mosaïques de façade sont rendues visibles depuis le parvis, les ouvertures entre poutres en bord de façade sont comblées, le débord des assises est réduit et les arbres de lisière sont légèrement mieux ancrés dans leurs massifs. Chaque spot conserve son globe diffusant de 4,5 cm maximum et ses quatre LED en X.
 
 ## Publication
 
