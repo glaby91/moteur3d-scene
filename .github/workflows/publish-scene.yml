@@ -10,6 +10,7 @@ on:
       - 'tools/prepare_scene_release.py'
       - 'tools/apply_plaza_lighting_patch.py'
       - 'tools/apply_scene_v17_607.py'
+      - 'tools/apply_scene_v17_608.py'
       - '.github/workflows/publish-scene.yml'
   workflow_dispatch:
 

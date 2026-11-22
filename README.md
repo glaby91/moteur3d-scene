@@ -2,7 +2,7 @@
 
 Ce dépôt contient uniquement les données de la scène civique de référence de V17 : géométrie, instances, matériaux, textures et caméras. Il ne contient aucun exécutable ni code du moteur. Les données sont conservées dans `payload/` en blocs d’archive afin que chaque fichier source reste lisible par les outils GitHub.
 
-La source de base est **V17.605**. La révision publiée **V17.607** corrige la scène du complexe aquatique : les spots très bas sont déplacés autour du banc ovale et renforcés, les mosaïques de façade sont rendues visibles depuis le parvis, les ouvertures entre poutres en bord de façade sont comblées, le débord des assises est réduit et les arbres de lisière sont légèrement mieux ancrés dans leurs massifs. Chaque spot conserve son globe diffusant de 4,5 cm maximum et ses quatre LED en X.
+La source de base est **V17.605**. La révision **V17.608** reprend les corrections du parvis du complexe aquatique : dossier courbe en béton sur les assises du banc ovale, modules ajustés pour éviter les recouvrements, fermeture des deux retours latéraux entre fenêtres et bords du bâtiment avec mosaïque posée en façade, et éclairage au sol renforcé pour tous les backends (48 sources extérieures, rayon 13 m, intensité 6). Les spots restent affleurants, avec globe diffusant de 4,5 cm maximum et quatre LED en X ; leur allumage est piloté par le contrôle nocturne commun de la scène.
 
 ## Publication
 
