@@ -2,7 +2,7 @@
 
 Ce dépôt contient uniquement les données de la scène civique de référence de V17 : géométrie, instances, matériaux, textures et caméras. Il ne contient aucun exécutable ni code du moteur. Les données sont conservées dans `payload/` en blocs d’archive afin que chaque fichier source reste lisible par les outils GitHub.
 
-La source de base est **V17.605**. La révision **V17.609** conserve les corrections du parvis de V17.608, rend l’écriture de l’enseigne du complexe aquatique lumineuse la nuit, ajoute quatre sources discrètes dans la butte pour éclairer le monument et élargit les halos des spots au sol afin d’atténuer les quatre zones lumineuses distinctes autour du banc. L’allumage des sources extérieures suit le contrôle nocturne commun de la scène.
+La source de base est **V17.605**. La révision **V17.610** conserve les corrections du parvis, éclaire les lettres de l’enseigne avec le matériau nocturne reconnu par le moteur, adoucit les halos des globes en supprimant leurs sources ponctuelles dédoublées, ajoute un éclairage modéré pour le monument et les arbres et éclaire le chemin entre le bâtiment et la place. Toutes les sources extérieures suivent l’hystérésis jour/nuit du moteur.
 
 ## Publication
 

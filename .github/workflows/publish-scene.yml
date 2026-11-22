@@ -12,6 +12,7 @@ on:
       - 'tools/apply_scene_v17_607.py'
       - 'tools/apply_scene_v17_608.py'
       - 'tools/apply_scene_v17_609.py'
+      - 'tools/apply_scene_v17_610.py'
       - '.github/workflows/publish-scene.yml'
   workflow_dispatch:
 
