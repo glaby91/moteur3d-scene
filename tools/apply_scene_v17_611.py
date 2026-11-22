@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 
 def _json(data: dict) -> bytes:
