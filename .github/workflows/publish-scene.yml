@@ -1,0 +1,47 @@
+name: Publish standalone V17 scene
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'payload/**'
+      - 'source-archive.json'
+      - 'scene-release.json'
+      - 'tools/prepare_scene_release.py'
+      - '.github/workflows/publish-scene.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-v17-scene
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Reassemble and validate the scene-only archive
+        id: package
+        shell: bash
+        run: |
+          python tools/prepare_scene_release.py \
+            --output dist \
+            --source-commit "$GITHUB_SHA" \
+            --repository "$GITHUB_REPOSITORY"
+          revision="$(python -c 'import json; print(json.load(open("dist/SCENE_VERSION.json"))["revision"])')"
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+          echo "tag=scene-$revision-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Publish latest scene release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.package.outputs.tag }}
+          name: V17 scene ${{ steps.package.outputs.revision }} — build ${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          generate_release_notes: true
+          files: |
+            dist/V17-scene.zip
+            dist/SCENE_VERSION.json
