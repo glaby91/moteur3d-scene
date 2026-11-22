@@ -24,8 +24,8 @@ def main() -> None:
     release = json.loads((ROOT / "scene-release.json").read_text(encoding="utf-8"))
     if source.get("schema") != 1 or release.get("schema") != 1:
         raise SystemExit("Unsupported scene package manifest schema")
-    if source.get("revision") != release.get("revision"):
-        raise SystemExit("Source archive and release manifest revisions differ")
+    if source.get("revision") != release.get("baseRevision", source.get("revision")):
+        raise SystemExit("Source archive revision does not match release baseRevision")
     if release.get("scene") != "benchmark-civic/scene.json":
         raise SystemExit("Unexpected scene entry point")
 
@@ -42,9 +42,16 @@ def main() -> None:
     scene_path = release["scene"]
     if scene_path not in src_zip.namelist():
         raise SystemExit(f"Missing scene entry point in archive: {scene_path}")
-    scene = json.loads(src_zip.read(scene_path))
+    files = {name: src_zip.read(name) for name in src_zip.namelist()}
+    scene = json.loads(files[scene_path])
+    if scene.get("revision") != source["revision"]:
+        raise SystemExit("base scene.json revision does not match source-archive.json")
+    if release["revision"] == "V17.606":
+        from apply_plaza_lighting_patch import apply_patch
+        apply_patch(files, scene_path, release["revision"])
+        scene = json.loads(files[scene_path])
     if scene.get("revision") != release["revision"]:
-        raise SystemExit("scene.json revision does not match scene-release.json")
+        raise SystemExit("Final scene.json revision does not match scene-release.json")
 
     version = {
         "schema": 1,
@@ -58,16 +65,16 @@ def main() -> None:
     version_path.write_text(json.dumps(version, indent=2) + "\n", encoding="utf-8")
     out_archive = args.output / "V17-scene.zip"
     with zipfile.ZipFile(out_archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as dst:
-        for info in src_zip.infolist():
-            if info.filename == "SCENE_VERSION.json":
+        for name, content in files.items():
+            if name == "SCENE_VERSION.json":
                 continue
-            dst.writestr(info.filename, src_zip.read(info.filename), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            dst.writestr(name, content, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
         dst.writestr("SCENE_VERSION.json", version_path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     with zipfile.ZipFile(out_archive) as result:
         bad_file = result.testzip()
         if bad_file or scene_path not in result.namelist():
             raise SystemExit(f"Invalid final scene release archive: {bad_file or scene_path}")
-    print(f"Verified scene release source: {release['revision']} ({source['sizeBytes']} bytes)")
+    print(f"Verified scene release: {release['revision']} (base {source['revision']}, {source['sizeBytes']} bytes)")
 
 
 if __name__ == "__main__":

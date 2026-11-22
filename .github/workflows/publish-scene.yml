@@ -8,6 +8,7 @@ on:
       - 'source-archive.json'
       - 'scene-release.json'
       - 'tools/prepare_scene_release.py'
+      - 'tools/apply_plaza_lighting_patch.py'
       - '.github/workflows/publish-scene.yml'
   workflow_dispatch:
 

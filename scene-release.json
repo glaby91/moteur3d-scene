@@ -1,6 +1,7 @@
 {
   "schema": 1,
-  "revision": "V17.605",
+  "revision": "V17.606",
+  "baseRevision": "V17.605",
   "scene": "benchmark-civic/scene.json",
   "sourceBranch": "main"
 }

@@ -2,7 +2,7 @@
 
 Ce dépôt contient uniquement les données de la scène civique de référence de V17 : géométrie, instances, matériaux, textures et caméras. Il ne contient aucun exécutable ni code du moteur. Les données sont conservées dans `payload/` en blocs d’archive afin que chaque fichier source reste lisible par les outils GitHub.
 
-La révision initiale est **V17.605**. Elle reprend la scène avec les corrections récentes du jardin et des arbres, les pots déplacés derrière la façade vitrée, les fragments d'étage supprimés et les éléments de mosaïque.
+La source de base est **V17.605**. La révision publiée **V17.606** lui ajoute les cinq luminaires très bas, alignés au centre de l'allée vers le monument du complexe aquatique. Chaque luminaire a une collerette presque affleurante, un globe diffusant qui dépasse de 4,5 cm au maximum et quatre LED en X. Les anciens points lumineux génériques dispersés sur la place sont supprimés.
 
 ## Publication
 
@@ -14,4 +14,4 @@ La compilation LumaTrace V17 récupère cet asset, vérifie son manifeste et sa 
 
 ## Faire évoluer la scène
 
-Pour préparer une nouvelle révision, modifier les ressources de la scène, reconstruire `payload/` avec `V17-scene.zip` et mettre à jour `source-archive.json` ainsi que `scene-release.json`. Augmenter `revision` (`V17.606`, `V17.607`, etc.). Le workflow publiera ensuite le paquet de scène sans compiler le moteur.
+Le paquet est produit depuis l'archive de base et les correctifs versionnés dans `tools/`. Le workflow vérifie la révision obtenue puis publie automatiquement `V17-scene.zip` et `SCENE_VERSION.json`, sans compiler le moteur. La révision source de base peut donc rester épinglée pendant que les correctifs de scène avancent.
