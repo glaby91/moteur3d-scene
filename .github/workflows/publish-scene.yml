@@ -46,3 +46,4 @@ jobs:
           files: |
             dist/V17-scene.zip
             dist/SCENE_VERSION.json
+            dist/scene-inspection.json
