@@ -50,7 +50,28 @@ def print_scene_inspection(files: dict[str, bytes]) -> None:
                     "rotation": item.get("rotation"),
                     "rotationY": item.get("rotationY"),
                 })
-    print("SCENE_INSPECTION_JSON=" + json.dumps(report, ensure_ascii=False, separators=(",", ":")))
+    report["sceneJson"] = json.loads(files["benchmark-civic/scene.json"])
+    report["supportingJson"] = {}
+    for name, raw in files.items():
+        if not name.endswith(".json") or name == "benchmark-civic/scene.json":
+            continue
+        if (name.endswith("trees-v600-plaza.json")
+                or name.endswith("trees-v601-plaza.json")
+                or name.endswith("scene-fix-v17.603.json")
+                or name.startswith("benchmark-civic/lighting/")):
+            try:
+                report["supportingJson"][name] = json.loads(raw)
+            except (ValueError, UnicodeDecodeError):
+                pass
+        if name.startswith("benchmark-civic/geometry/"):
+            try:
+                data = json.loads(raw)
+            except (ValueError, UnicodeDecodeError):
+                continue
+            encoded = json.dumps(data, ensure_ascii=False).lower()
+            if "v604_mosaic_panel_mesh" in encoded or "v604_facade" in encoded:
+                report["supportingJson"][name] = data
+        print("SCENE_INSPECTION_JSON=" + json.dumps(report, ensure_ascii=False, separators=(",", ":")))
 
 
 def main() -> None:
