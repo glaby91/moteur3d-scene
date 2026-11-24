@@ -8,7 +8,7 @@ Audit effectué le 24 novembre 2026. Les branches sont conservées ; ce repère 
 **Révision actuelle indiquée dans le README :** V17.623.  
 **PR ouverte :** aucune au moment de l’audit.
 
-La branche `codex/v17-623-glass-mosaic` pointe actuellement sur le même commit que `main`. Elle est conservée, mais `main) est la branche à utiliser pour les prochaines modifications de scène et publications.
+La branche `codex/v17-623-glass-mosaic` pointe actuellement sur le même commit que `main`. Elle est conservée, mais `main` est la branche à utiliser pour les prochaines modifications de scène et publications.
 
 ## Branches observées
 
@@ -23,6 +23,6 @@ Ne pas reprendre les branches `package/*` pour modifier la scène civique de ré
 
 ## Règle de travail
 
-Modifier les données et scripts de scène sur `main), puis vérifier la génération et la publication. Le moteur récupère la release de scène selon son workflow ; les dépôts moteur et scène restent séparés.
+Modifier les données et scripts de scène sur `main`, puis vérifier la génération et la publication. Le moteur récupère la release de scène selon son workflow ; les dépôts moteur et scène restent séparés.
 
 Aucune branche n’a été supprimée, fermée, renommée ou déplacée pendant cet audit.
