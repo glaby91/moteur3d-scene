@@ -6,7 +6,7 @@ Ce dépôt contient les données de la scène civique de référence de V17 : g�
 
 ## Révision publiée
 
-La dernière scène préparée est **V17.624**. Elle intègre un camion de glaces décoratif sur une dalle existante, près des arbres et du massif ; ses roues sont posées au niveau du sol et l’avant est orienté vers la place. Elle est générée depuis l’archive de base **V17.605** et les correctifs versionnés dans `tools/`, dont l’intégration du camion de glaces V17.624. Cette révision remplace les deux pans du petit mur en L des vestiaires par une mosaïque de verre translucide aux vagues aqua, turquoise et bleu profond, avec de fines touches champagne. Elle déplace aussi les luminaires du pourtour de l’ascenseur vers les poutres latérales.
+La dernière scène préparée est **V17.625**. Elle conserve la géométrie réelle du camion de glaces fourni, corrige les faces exportées à l’envers, le passe à environ 4,30 × 2,20 × 2,05 m et garde ses roues posées sur le dallage, élargi pour porter le véhicule. La caisse reçoit une livrée ivoire et turquoise, un filet rouge et un panneau latéral en cyrillique ; aucune pièce de carrosserie n’est inventée. La scène part de l’archive **V17.605** et applique les correctifs versionnés dans `tools/`. Les révisions antérieures conservent notamment la mosaïque vitrée aqua/turquoise et les luminaires repositionnés.
 
 Le fichier racine `SCENE_VERSION.json` identifie l’archive source épinglée V17.605. Le manifeste de publication `scene-release.json` identifie la révision produite ; le workflow génère le manifeste de sortie de la révision publiée et le place dans l’archive. Pour le moteur et les utilisateurs, le manifeste inclus dans l’asset de release est la référence de la scène livrée.
 
