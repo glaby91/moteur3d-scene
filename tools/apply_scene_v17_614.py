@@ -97,20 +97,20 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
     files[detail_path] = _dump({
         "format": "m3d-geometry-v1", "units": "meters",
         "meshes": [
-            _annulus_mesh("v614_lift_marble_annulus", 2.42, 1.39, .035),
-            _annulus_mesh("v614_lift_brass_inlay", 2.455, 2.425, .018),
-            _disc_mesh("v614_lift_car_floor", 1.00, .13),
+            _annulus_mesh("geo_v614_lift_marble_annulus", 2.42, 1.39, .035),
+            _annulus_mesh("geo_v614_lift_brass_inlay", 2.455, 2.425, .018),
+            _disc_mesh("geo_v614_lift_car_floor", 1.00, .13),
         ],
     })
     items.extend([
         {"id": "v614_lift_marble_annulus", "parent": "Interieur/Galeries/Médaillon circulaire en marbre autour ascenseur",
-         "geometry": "v614_lift_marble_annulus", "material": "v614_lift_marble",
+         "geometry": "geo_v614_lift_marble_annulus", "material": "v614_lift_marble",
          "position": [-40.0, .015, -34.0], "size": [1.0, 1.0, 1.0], "rotationY": 0},
         {"id": "v614_lift_brass_inlay", "parent": "Interieur/Galeries/Médaillon circulaire en marbre autour ascenseur",
-         "geometry": "v614_lift_brass_inlay", "material": "v614_lift_brass",
+         "geometry": "geo_v614_lift_brass_inlay", "material": "v614_lift_brass",
          "position": [-40.0, .032, -34.0], "size": [1.0, 1.0, 1.0], "rotationY": 0},
         {"id": "v614_lift_car_floor", "parent": "Interieur/Galeries/Ascenseur capsule alu et verre dans trémie ouest/Cabine mobile",
-         "geometry": "v614_lift_car_floor", "material": "prp_terrazzo_floor",
+         "geometry": "geo_v614_lift_car_floor", "material": "prp_terrazzo_floor",
          "position": [-40.0, -.08, -34.0], "size": [1.0, 1.0, 1.0], "rotationY": 0},
     ])
 
