@@ -2,6 +2,8 @@
 
 Ce dépôt contient les données de la scène civique de référence de V17 : géométrie, instances, matériaux, textures et caméras. Il ne contient aucun exécutable ni code du moteur.
 
+> **Branche active de la scène :** `main`. La branche `codex/v17-623-glass-mosaic` pointe sur le même commit au moment de l’audit. Les branches de package restent archivées et ne sont pas le point de départ de la scène civique ; voir [BRANCH_STATUS.md](BRANCH_STATUS.md).
+
 ## Révision publiée
 
 La dernière scène préparée est **V17.623**. Elle est générée depuis l’archive de base **V17.605** et les correctifs versionnés dans `tools/`. Cette révision remplace les deux pans du petit mur en L des vestiaires par une mosaïque de verre translucide aux vagues aqua, turquoise et bleu profond, avec de fines touches champagne. Elle déplace aussi les luminaires du pourtour de l’ascenseur vers les poutres latérales.
