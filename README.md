@@ -17,6 +17,12 @@ La release contient `V17-scene.zip` et son manifeste `SCENE_VERSION.json`. Les l
 
 Le dépôt moteur [CSE WARP](https://github.com/glaby91/moteur3d) récupère la dernière release au moment de la compilation, valide son manifeste et son chargement, puis l’intègre au package Windows autonome. Le build officiel [V17.003 #587](https://github.com/glaby91/moteur3d/actions/runs/45080722276) a livré la scène V17.613.
 
+## Scène historique de Pripiat — place centrale
+
+Un package autonome de données est également disponible pour la **scène centrale de Pripiat** : la place, le Palais de la Culture Energetik et l’hôtel Polissya. L’archive contient le binaire de scène natif, les sources éditables et la documentation ; elle ne contient pas le moteur ni son exécutable.
+
+[Télécharger le package de la scène centrale de Pripiat — Energetik, place et Polissya](https://github.com/glaby91/moteur3d-scene/releases/download/pripyat-scene-central-20261124.1/Pripyat-place-centrale-Energetik-Polissya.zip) · [Notes de la version](https://github.com/glaby91/moteur3d-scene/releases/tag/pripyat-scene-central-20261124.1)
+
 ## Faire évoluer la scène
 
 Les fichiers de correction versionnés dans `tools/` produisent la scène publiée depuis l’archive de base. Chaque commit concerné poussé sur `main` lance le workflow de publication, qui valide l’archive et met à disposition une nouvelle release sans compiler le moteur.
