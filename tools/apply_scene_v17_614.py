@@ -249,6 +249,11 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
     }
     files[prefix + "reports/interior-lift-v614.json"] = _dump(motion)
     scene = json.loads(files[scene_path])
+    geometry_rel = "geometry/v614-lift-details.json"
+    for sector in scene.get("sectors", []):
+        geometry_files = sector.setdefault("geometry", [])
+        if geometry_rel not in geometry_files:
+            geometry_files.append(geometry_rel)
     scene["revision"] = revision
     scene["sceneVersion"] = revision
     files[scene_path] = _dump(scene)
