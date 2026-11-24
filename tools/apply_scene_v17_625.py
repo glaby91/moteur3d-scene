@@ -179,7 +179,7 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
         materials.append({"id":mat,"baseColor":color,"roughness":roughness,"metallic":metallic,
                           "transmission":0.0,"ior":1.5,"textureSet":"tex_"+mat,
                           "origin":"V17.625 printed enamel livery and accent stripe"})
-        entry={"id":"tex_"+mat,"material":mat,"pattern":pattern,"resolution":1200 if short=="side_sign" else 32,
+        entry={"id":"tex_"+mat,"material":mat,"pattern":pattern,"resolution":1200 if short=="side_sign" else 64,
                "channels":["albedo"],"status":"V17.625 custom retro Soviet-style ice-cream livery"}
         if short=="side_sign": entry["imageFile"]="textures/camion-glaces-side-v625.jpg"
         else: entry.update({"baseColor":color,"roughness":roughness})
