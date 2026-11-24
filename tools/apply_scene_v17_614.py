@@ -201,7 +201,7 @@ def apply_patch(files: dict[str, bytes], scene_path: str, revision: str) -> None
     set_ids = {entry.get("id") for entry in sets}
     if "tex_v614_lift_marble" not in set_ids:
         sets.append({"id": "tex_v614_lift_marble", "material": "v614_lift_marble",
-                     "pattern": "image", "resolution": 1280, "channels": ["albedo"],
+                     "pattern": "image", "resolution": 1024, "channels": ["albedo"],
                      "imageFile": "textures/v614_lift_marble.png",
                      "textureDetail": {"mode": "preserve", "minResolution": 1024},
                      "status": "Seamless base-color texture generated from approved marble reference"})
