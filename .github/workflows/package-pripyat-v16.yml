@@ -1,0 +1,94 @@
+name: Publish Pripyat V16 compatible scene package
+
+on:
+  push:
+    branches:
+      - package/pripyat-v16-compat-20261124
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the scene package repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch the pinned Pripyat source
+        run: |
+          git clone --filter=blob:none https://github.com/glaby91/moteur3d.git engine-src
+          git -C engine-src checkout --detach 4aea54510188441fa423ea72c33c954e5b1756f0
+
+      - name: Convert the scene to modular V16 JSON
+        run: |
+          mkdir -p dist/Pripyat-V16
+          node tools/pripyat/convert_pripyat_v14_to_v16.mjs \
+            engine-src/experiments/2026-10-30-cote-ete-gt/native_v14 \
+            dist/Pripyat-V16/pripyat
+
+      - name: Assemble the scene-only archive
+        run: |
+          set -euo pipefail
+          SRC=engine-src/experiments/2026-10-30-cote-ete-gt/native_v14
+          PKG=dist/Pripyat-V16
+          mkdir -p "$PKG/source" "$PKG/docs"
+          cp "$SRC/scene_pripyat_central.js" "$PKG/source/"
+          cp "$SRC/scene_pripyat_views.json" "$PKG/source/"
+          cp "$SRC/assets/pripyat/energetik_cinema_seat.js" "$PKG/source/"
+          cp tools/pripyat/convert_pripyat_v14_to_v16.mjs "$PKG/source/"
+          cp engine-src/docs/pripyat/README.md "$PKG/docs/"
+          cp engine-src/docs/pripyat/ENERGETIK-REFERENCES-ET-QUALITE.md "$PKG/docs/"
+          cp engine-src/docs/pripyat/CAHIER-ENERGETIK-PASSE-261104.md "$PKG/docs/"
+          cat > "$PKG/SCENE_VERSION.json" <<'EOF'
+          {
+            "package": "Pripyat central scene",
+            "revision": "PRIPYAT-V16-2026.11.24.1",
+            "format": "m3d-scene-v16",
+            "entrypoint": "pripyat/scene.json",
+            "source_repository": "https://github.com/glaby91/moteur3d",
+            "source_branch": "pripiat",
+            "source_commit": "4aea54510188441fa423ea72c33c954e5b1756f0",
+            "compatible_engine_line": "Moteur 3D V16/V17",
+            "engine_executable_included": false,
+            "scope": ["central square", "Palace of Culture Energetik", "Hotel Polissya"]
+          }
+          EOF
+          cat > "$PKG/README.md" <<'EOF'
+          # Scène centrale de Pripiat — Energetik, place et Polissya
+
+          Ce package contient les données de scène converties au format modulaire V16 m3d-scene-v16. Il peut être ouvert dans Moteur 3D V17 avec Fichier → Ouvrir une scène V16 (scene.json) en choisissant pripyat/scene.json après extraction.
+
+          La scène comprend la place centrale, le Palais de la Culture Energetik et l’hôtel Polissya, ainsi que les arbres, le mobilier, l’éclairage et les vues associés. Le palais est le bâtiment détaillé ; Polissya reste un volume de contexte.
+
+          ## Contenu
+
+          - pripyat/scene.json et ressources JSON : scène V16 prête à charger.
+          - source/ : source V14 originale, vues, helper de siège et convertisseur.
+          - docs/ : documentation et références de reconstruction.
+          - SCENE_VERSION.json : version, format et provenance.
+
+          ## Conversion
+
+          Les boîtes et boîtes arrondies sont exportées comme boîtes V16. Les ellipsoïdes et capsules deviennent des lots de maillages triangulés groupés par matériau, puis le format V16 génère son BVH au chargement. La conversion conserve le placement, les dimensions, les matériaux, les lumières et les vues. Les volumes analytiques sont discrétisés ; l’ombrage des surfaces courbes et les textures PBR régénérées peuvent donc différer du rendu V14.
+
+          Le package contient uniquement la scène, pas le moteur ni son exécutable. La provenance exacte se trouve dans SCENE_VERSION.json.
+          EOF
+          cd dist
+          zip -1 -qr "$GITHUB_WORKSPACE/Pripyat-place-centrale-V16-V17-compatible.zip" Pripyat-V16
+
+      - name: Publish versioned package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create pripyat-scene-v16-compat-20261124.1 \
+            "$GITHUB_WORKSPACE/Pripyat-place-centrale-V16-V17-compatible.zip" \
+            --repo glaby91/moteur3d-scene \
+            --title "Scène centrale de Pripiat — compatible V16/V17" \
+            --notes "Scène de données V16 uniquement : place centrale, Palais Energetik, Hôtel Polissya, sources et documentation. La géométrie analytique V14 est convertie en maillages triangulés ; aucun exécutable moteur n’est inclus. Source moteur3d@4aea54510188441fa423ea72c33c954e5b1756f0." \
+            --latest=false
