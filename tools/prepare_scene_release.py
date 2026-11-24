@@ -52,53 +52,53 @@ def main() -> None:
     scene = json.loads(files[scene_path])
     if scene.get("revision") != source["revision"]:
         raise SystemExit("base scene.json revision does not match source-archive.json")
-    if release["revision"] in ("V17.606", "V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.606", "V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_plaza_lighting_patch import apply_patch as apply_v606
         apply_v606(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.607", "V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_607 import apply_patch as apply_v607
         apply_v607(files, scene_path, "V17.607")
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.608", "V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_608 import apply_patch as apply_v608
         apply_v608(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.609", "V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_609 import apply_patch as apply_v609
         apply_v609(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.610", "V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_610 import apply_patch as apply_v610
         apply_v610(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.611", "V17.612", "V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_611 import apply_patch as apply_v611
         apply_v611(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.613", "V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_613 import apply_patch as apply_v613
         apply_v613(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.614", "V17.615", "V17.616", "V17.617", "V17.618", "V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_614 import apply_patch as apply_v614
         apply_v614(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.618", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.618", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_618 import apply_patch as apply_v618
         apply_v618(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
-    if release["revision"] in ("V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.619", "V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_619 import apply_patch as apply_v619
         apply_v619(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] in ("V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.620", "V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_620 import apply_patch as apply_v620
         apply_v620(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] in ("V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.621", "V17.622", "V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_621 import apply_patch as apply_v621
         apply_v621(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
@@ -108,24 +108,28 @@ def main() -> None:
         apply_v622(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] in ("V17.623", "V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.623", "V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_623 import apply_patch as apply_v623
         apply_v623(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] in ("V17.624", "V17.625", "V17.626"):
+    if release["revision"] in ("V17.624", "V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_624 import apply_patch as apply_v624
         apply_v624(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] in ("V17.625", "V17.626"):
+    if release["revision"] in ("V17.625", "V17.626", "V17.627"):
         from apply_scene_v17_625 import apply_patch as apply_v625
         apply_v625(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
-    if release["revision"] == "V17.626":
+    if release["revision"] in ("V17.626", "V17.627"):
         from apply_scene_v17_626 import apply_patch as apply_v626
         apply_v626(files, scene_path, release["revision"])
+        scene = json.loads(files[scene_path])
+    if release["revision"] == "V17.627":
+        from apply_scene_v17_627 import apply_patch as apply_v627
+        apply_v627(files, scene_path, release["revision"])
         scene = json.loads(files[scene_path])
 
     # Keep backend mip allocation requirements out of the published scene: each requested size must be POT.

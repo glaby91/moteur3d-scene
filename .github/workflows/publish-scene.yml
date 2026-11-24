@@ -25,6 +25,7 @@ on:
       - 'tools/apply_scene_v17_624.py'
       - 'tools/apply_scene_v17_625.py'
       - 'tools/apply_scene_v17_626.py'
+      - 'tools/apply_scene_v17_627.py'
       - 'assets/camion_icecream.obj'
       - 'assets/camion_icecream.mtl'
       - 'assets/camion-glaces-side-v625.jpg'
