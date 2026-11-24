@@ -1,0 +1,96 @@
+name: Package Pripyat central scene
+
+on:
+  push:
+    branches:
+      - package/pripyat-central-scene-20261124
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out package repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch the pinned Pripyat scene source
+        run: |
+          git clone --filter=blob:none https://github.com/glaby91/moteur3d.git engine-src
+          git -C engine-src checkout --detach 4aea54510188441fa423ea72c33c954e5b1756f0
+
+      - name: Export the scene-only binary
+        working-directory: engine-src/experiments/2026-10-30-cote-ete-gt/native_v14
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/package"
+          M3D_SKIP_IMPORTED_CAR=1 node export_scene.js source_v1314.html "$GITHUB_WORKSPACE/package/scene_pripyat_central.bin" scene_pripyat_central.js
+
+      - name: Assemble the scene package
+        env:
+          SOURCE_SHA: 4aea54510188441fa423ea72c33c954e5b1756f0
+        run: |
+          set -euo pipefail
+          SRC=engine-src/experiments/2026-10-30-cote-ete-gt/native_v14
+          mkdir -p package/source package/docs
+          cp "$SRC/scene_pripyat_central.js" package/source/
+          cp "$SRC/scene_pripyat_views.json" package/source/
+          cp "$SRC/assets/pripyat/energetik_cinema_seat.js" package/source/
+          cp engine-src/docs/pripyat/README.md package/docs/
+          cp engine-src/docs/pripyat/ENERGETIK-REFERENCES-ET-QUALITE.md package/docs/
+          cp engine-src/docs/pripyat/CAHIER-ENERGETIK-PASSE-261104.md package/docs/
+          cat > package/SCENE_VERSION.json <<EOF
+          {
+            "package": "Pripyat central scene",
+            "version": "2026.11.24.1",
+            "scope": ["central square", "Palace of Culture Energetik", "Hotel Polissya"],
+            "scene_file": "scene_pripyat_central.bin",
+            "source_repository": "https://github.com/glaby91/moteur3d",
+            "source_branch": "pripiat",
+            "source_commit": "$SOURCE_SHA",
+            "engine_included": false
+          }
+          EOF
+          cat > package/README.md <<'EOF'
+          # Scène centrale de Pripiat — Energetik, place et Polissya
+
+          Ce package contient uniquement les données de la scène : le binaire natif scene_pripyat_central.bin, ses sources éditables et les références de reconstruction. Il ne contient pas l’exécutable ni le code du moteur.
+
+          ## Périmètre
+
+          - Place centrale de Pripiat et ses abords.
+          - Palais de la Culture Energetik, bâtiment principal détaillé.
+          - Hôtel Polissya, représenté comme volume de contexte dans la scène.
+          - Arbres, mobilier, éclairages et vues de visite associés.
+
+          ## Utilisation
+
+          Dans Moteur 3D V14, ouvrir scene_pripyat_central.bin via le menu Scène → Ouvrir une scène…. Le cadrage et les vues de la scène sont décrits dans source/scene_pripyat_views.json.
+
+          Pour modifier ou réexporter la scène, reprendre source/scene_pripyat_central.js et le helper fourni. L’exporteur et le moteur restent dans le dépôt moteur3d. La provenance exacte est dans SCENE_VERSION.json.
+
+          ## Contenu
+
+          - scene_pripyat_central.bin : scène exportée, géométrie, matériaux, lumières et BVH.
+          - source/ : définition JavaScript modifiable, vues et helper du siège de cinéma.
+          - docs/ : cahier de scène et références Energetik.
+          - SCENE_VERSION.json : version et provenance.
+          EOF
+          cd package
+          zip -1 -qr "$GITHUB_WORKSPACE/Pripyat-place-centrale-Energetik-Polissya.zip" .
+
+      - name: Publish the scene-only package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create pripyat-scene-central-20261124.1 \
+            "$GITHUB_WORKSPACE/Pripyat-place-centrale-Energetik-Polissya.zip" \
+            --repo glaby91/moteur3d-scene \
+            --title "Scène centrale de Pripiat — Energetik, place et Polissya" \
+            --notes "Package de scène uniquement (aucun moteur/exécutable). Binaire natif, sources éditables, vues et documentation. Source moteur3d@4aea54510188441fa423ea72c33c954e5b1756f0." \
+            --latest=false
