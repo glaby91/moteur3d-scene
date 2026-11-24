@@ -22,6 +22,9 @@ on:
       - 'tools/apply_scene_v17_621.py'
       - 'tools/apply_scene_v17_622.py'
       - 'tools/apply_scene_v17_623.py'
+      - 'tools/apply_scene_v17_624.py'
+      - 'assets/camion_icecream.obj'
+      - 'assets/camion_icecream.mtl'
       - '.github/workflows/publish-scene.yml'
   workflow_dispatch:
 
