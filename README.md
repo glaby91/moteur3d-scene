@@ -34,3 +34,6 @@ Suppression des deux cloisons de mosaïque de verre, des cinq douches et de la d
 
 ### V17.633 — neuf corrections du hall ouest
 Dalle continue, cage ascenseur jusqu'au plafond, deux appliques verticales et deux vitraux sportifs autoportants. [Périmètre et contrôles](docs/V17.633-neuf-corrections.md). Publication conditionnée aux tests natifs.
+
+### V17.634 — correction éclairage des appliques
+14 sources existantes ajustées, sans changement géométrique. [Rapport](docs/V17.634-lumieres.md). À utiliser avec moteur V17.026 pour l'émission générique.

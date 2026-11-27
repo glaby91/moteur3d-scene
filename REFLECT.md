@@ -7,3 +7,5 @@ Schema 2 includes the pool water plane in the same runtime index as glazing, fiv
 V17.632 : nettoyage géométrique ciblé, politique optique inchangée hors numéro de version ; recalcul obligatoire des caches. [Rapport](docs/V17.632-nettoyage.md).
 
 V17.633 : vitraux décoratifs transmissifs, exclus des caméras de réflexion planaires. Caches régénérés.
+
+V17.634 : ajustement des lumières seulement ; politique optique inchangée hors révision.
