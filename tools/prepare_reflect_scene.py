@@ -66,7 +66,7 @@ def package(work, output):
     require(all(o["authorized"] and o["material"]!="v614_lift_blue_glass" for o in catalogue["objects"]), "Wrong author selection")
     require(len(catalogue["cameraSimulation"])==29 and all(v["indexParity"] and v["selectedUncapped"]<=2 for v in catalogue["cameraSimulation"]), "Camera regression")
     runtime=load(pre/"zreflect-index.json")["payload"]
-    require(runtime["schema"]==1 and len(runtime["planes"])==4 and runtime["nodes"] and len(runtime["order"])==4,"Invalid runtime glass index")
+    require(runtime["schema"]==2 and len(runtime["planes"])==5 and runtime["nodes"] and len(runtime["order"])==5,"Invalid runtime glass index")
     files={}
     for name in ("csp001-bvh.bin","zreflect-candidates.json","zreflect-index.json","zreflect-policy.json","reflection-probes.json"):
         path=pre/name
