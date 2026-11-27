@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sceneRevision": "V17.632",
-  "sceneTag": "scene-reflect-V17.632",
+  "sceneRevision": "V17.633",
+  "sceneTag": "scene-reflect-V17.633",
   "sceneSourceCommit": "b01abf27cf96ee47867918a513c9f71a7222a976",
   "materialRules": {
     "v614_lift_blue_glass": {
@@ -13,6 +13,30 @@
     },
     "cse_pool_water": {
       "planarReflection": "auto"
+    },
+    "v633_mosaic_aqua": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_teal": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_cobalt": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_clear": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_gold": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_red": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_ivory": {
+      "planarReflection": "disabled"
+    },
+    "v633_mosaic_outline": {
+      "planarReflection": "disabled"
     }
   },
   "sharedProbes": [

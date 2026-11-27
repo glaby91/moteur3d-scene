@@ -5,3 +5,5 @@ The validated Reflect scene is promoted to main and latest without rewriting its
 Schema 2 includes the pool water plane in the same runtime index as glazing, five planes total. Schema 1 is rejected by the new loader.
 
 V17.632 : nettoyage géométrique ciblé, politique optique inchangée hors numéro de version ; recalcul obligatoire des caches. [Rapport](docs/V17.632-nettoyage.md).
+
+V17.633 : vitraux décoratifs transmissifs, exclus des caméras de réflexion planaires. Caches régénérés.

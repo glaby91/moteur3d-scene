@@ -31,3 +31,6 @@ Les fichiers de correction versionnés dans `tools/` produisent la scène publi�
 
 ### V17.632 — nettoyage ciblé (27 novembre 2026)
 Suppression des deux cloisons de mosaïque de verre, des cinq douches et de la dalle résiduelle de l'ancienne trémie du hall. Voir [rapport et périmètre](docs/V17.632-nettoyage.md). La publication reste conditionnée au workflow natif ; V17.631 conservée comme version de retour.
+
+### V17.633 — neuf corrections du hall ouest
+Dalle continue, cage ascenseur jusqu'au plafond, deux appliques verticales et deux vitraux sportifs autoportants. [Périmètre et contrôles](docs/V17.633-neuf-corrections.md). Publication conditionnée aux tests natifs.

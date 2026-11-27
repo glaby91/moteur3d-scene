@@ -33,8 +33,12 @@ def prepare(work, source_commit, engine_commit):
     scene=stage/"benchmark-civic/scene.json"
     doc=load(scene)
     require(doc["revision"]==cfg["baseRevision"], "Wrong scene revision")
-    if cfg["revision"]=="V17.632":
+    if cfg["revision"] in ("V17.632","V17.633"):
         from apply_scene_v17_632 import apply_patch
+        apply_patch(scene)
+        doc=load(scene)
+    if cfg["revision"]=="V17.633":
+        from apply_scene_v17_633 import apply_patch
         apply_patch(scene)
         doc=load(scene)
     policy=load(ROOT/cfg["policy"])
