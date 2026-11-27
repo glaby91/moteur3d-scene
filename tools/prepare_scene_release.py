@@ -24,7 +24,11 @@ def main() -> None:
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--repository", required=True)
+    parser.add_argument("--precompiler", type=Path, help="Optional already-built CSP001 executable")
+    parser.add_argument("--engine-commit", help="Full SHA used to build the precompiler")
     args = parser.parse_args()
+    if bool(args.precompiler) != bool(args.engine_commit):
+        parser.error("--precompiler and --engine-commit must be supplied together")
 
     source = json.loads((ROOT / "source-archive.json").read_text(encoding="utf-8"))
     release = json.loads((ROOT / "scene-release.json").read_text(encoding="utf-8"))
@@ -199,6 +203,9 @@ def main() -> None:
         bad_file = result.testzip()
         if bad_file or scene_path not in result.namelist():
             raise SystemExit(f"Invalid final scene release archive: {bad_file or scene_path}")
+    if args.precompiler:
+        from add_csp001 import add_precomputed
+        add_precomputed(out_archive, version_path, args.precompiler, args.engine_commit)
     print(f"Verified scene release: {release['revision']} (base {source['revision']}, {source['sizeBytes']} bytes)")
 
 
