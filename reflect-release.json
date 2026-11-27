@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "revision": "V17.630",
+  "baseRevision": "V17.629",
+  "tag": "scene-reflect-V17.630",
+  "engineCommit": "7f6b6be11cf23f62225f37708b241cca9d5466cb",
+  "channel": "reflect",
+  "policy": "config/zreflect-policy.json"
+}

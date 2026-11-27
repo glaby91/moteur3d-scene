@@ -1,0 +1,102 @@
+name: Build experimental Reflect scene and native sidecars
+on:
+  push:
+    branches: [feature/v17-csp001-zreflect-r001]
+    paths:
+      - 'payload/**'
+      - 'assets/**'
+      - 'source-archive.json'
+      - 'scene-release.json'
+      - 'reflect-release.json'
+      - 'config/zreflect-policy.json'
+      - 'tools/**'
+      - '.github/workflows/publish-reflect-scene.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: reflect-scene-publication
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve exact engine compiler commit
+        id: compiler
+        shell: pwsh
+        run: |
+          $cfg = Get-Content reflect-release.json -Raw | ConvertFrom-Json
+          if ($cfg.engineCommit -notmatch '^[a-f0-9]{40}$') { throw "Compiler must be pinned to a commit" }
+          "sha=$($cfg.engineCommit)" >> $env:GITHUB_OUTPUT
+      - uses: actions/checkout@v5
+        with:
+          repository: glaby91/moteur3d
+          ref: ${{ steps.compiler.outputs.sha }}
+          path: engine
+          persist-credentials: false
+      - name: Prepare final scene before native precomputation
+        shell: pwsh
+        run: |
+          $sha = (git -C engine rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -or $sha -ne "${{ steps.compiler.outputs.sha }}") { throw "Wrong compiler checkout" }
+          python tools/prepare_reflect_scene.py prepare --work reflect-work --source-commit $env:GITHUB_SHA --engine-commit $sha
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Install Qt for native compiler
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: qtmultimedia
+          cache: true
+      - name: Configure and build native scene compiler
+        shell: pwsh
+        run: |
+          $sceneRoot = (Resolve-Path reflect-work/stage/benchmark-civic).Path
+          cmake -S engine/v17 -B reflect-build -G "Visual Studio 17 2022" -A x64 "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR" "-DV17_SCENE_SOURCE_DIR=$sceneRoot" -DM3D_REQUIRE_VULKAN=OFF
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build reflect-build --config Release --target cse_scene_precompiler v17_csp001_smoke v17_zreflect_index_smoke --parallel 4
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $core = Get-ChildItem reflect-build -Recurse -File -Filter moteur3d_v16_core.dll | Select-Object -First 1
+          if (!$core) { throw "Core DLL missing" }
+          $env:PATH = "$($core.DirectoryName);$env:QT_ROOT_DIR/bin;$env:PATH"
+          ctest --test-dir reflect-build -C Release -R "^(v17_zreflect_spatial_60000|v17_csp001_roundtrip_visibility)$" --output-on-failure --no-tests=error
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Generate and roundtrip real scene native BVH and optical sidecars
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem reflect-build -Recurse -File -Filter cse_scene_precompiler.exe | Select-Object -First 1
+          $core = Get-ChildItem reflect-build -Recurse -File -Filter moteur3d_v16_core.dll | Select-Object -First 1
+          if (!$exe -or !$core) { throw "Compiler or DLL missing" }
+          $env:PATH = "$($core.DirectoryName);$env:QT_ROOT_DIR/bin;$env:PATH"
+          $env:M3D_CSP001 = "0"
+          & $exe.FullName (Resolve-Path reflect-work/stage/benchmark-civic/scene.json).Path
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify sidecars and package release
+        shell: pwsh
+        run: |
+          python tools/prepare_reflect_scene.py package --work reflect-work --output dist-reflect
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Reflect-scene-V17.630
+          path: dist-reflect/
+          if-no-files-found: error
+      - name: Publish isolated experimental prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: scene-reflect-V17.630
+          name: V17.630 Reflect experimental scene
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: false
+          files: |
+            dist-reflect/V17-scene.zip
+            dist-reflect/SCENE_VERSION.json
+          fail_on_unmatched_files: true
