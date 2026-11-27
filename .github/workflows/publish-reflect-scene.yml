@@ -1,7 +1,7 @@
-name: Build experimental Reflect scene and native sidecars
+name: Publish principal V17 optical scene
 on:
   push:
-    branches: [feature/v17-csp001-zreflect-r001]
+    branches: [main]
     paths:
       - 'payload/**'
       - 'assets/**'
@@ -18,7 +18,51 @@ concurrency:
   group: reflect-scene-publication
   cancel-in-progress: false
 jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.release.outputs.exists }}
+      tag: ${{ steps.release.outputs.tag }}
+      revision: ${{ steps.release.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Promote an existing immutable validated release, or prepare a new revision
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=$(python -c 'import json; print(json.load(open("reflect-release.json"))["tag"])')
+          revision=$(python -c 'import json; print(json.load(open("reflect-release.json"))["revision"])')
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" --json tagName,isPrerelease,isDraft,assets > release.json; then
+            # V17.631 was already validated and published. Never overwrite its files.
+            if [ "$tag" != 'scene-reflect-V17.631' ]; then
+              echo 'Release already exists; increment the scene revision before publishing changes.' >&2
+              exit 1
+            fi
+            gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" > release-api.json
+            python - <<'PY'
+          import json
+          r=json.load(open('release-api.json'))
+          a={x['name']: x['digest'] for x in r['assets']}
+          assert not r['draft'] and r['target_commitish']=='db26889c6c3aa4abf8a380fefac0d338fdad83ce'
+          assert a['V17-scene.zip']=='sha256:b44972105f1af661586e9602899529de9d4fc4e1edd994099b28b6b174f3e45d'
+          assert a['SCENE_VERSION.json']=='sha256:ecbeb3f2fe66b22aa8badf3352cedbe2871827751b1c09a5be4a52c6e5b148b7'
+          PY
+            git merge-base --is-ancestor db26889c6c3aa4abf8a380fefac0d338fdad83ce HEAD
+            gh release edit "$tag" --prerelease=false --latest --title 'V17.631 — scène principale CSE WARP'
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'exists=false' >> "$GITHUB_OUTPUT"
+          fi
   build:
+    needs: inspect
+    if: needs.inspect.outputs.exists == 'false'
     runs-on: windows-2022
     timeout-minutes: 60
     steps:
@@ -85,17 +129,17 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v6
         with:
-          name: Reflect-scene-V17.631
+          name: Scene-${{ needs.inspect.outputs.revision }}
           path: dist-reflect/
           if-no-files-found: error
-      - name: Publish isolated experimental prerelease
+      - name: Publish new principal scene release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: scene-reflect-V17.631
-          name: V17.631 Reflect experimental scene
+          tag_name: ${{ needs.inspect.outputs.tag }}
+          name: ${{ needs.inspect.outputs.revision }} — scène principale CSE WARP
           target_commitish: ${{ github.sha }}
-          prerelease: true
-          make_latest: false
+          prerelease: false
+          make_latest: true
           files: |
             dist-reflect/V17-scene.zip
             dist-reflect/SCENE_VERSION.json

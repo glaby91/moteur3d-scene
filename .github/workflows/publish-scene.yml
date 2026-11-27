@@ -1,37 +1,6 @@
-name: Publish standalone V17 scene
+name: Legacy base scene publisher (manual, not latest)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'payload/**'
-      - 'source-archive.json'
-      - 'scene-release.json'
-      - 'tools/prepare_scene_release.py'
-      - 'tools/apply_plaza_lighting_patch.py'
-      - 'tools/apply_scene_v17_607.py'
-      - 'tools/apply_scene_v17_608.py'
-      - 'tools/apply_scene_v17_609.py'
-      - 'tools/apply_scene_v17_610.py'
-      - 'tools/apply_scene_v17_611.py'
-      - 'tools/apply_scene_v17_613.py'
-      - 'tools/apply_scene_v17_614.py'
-      - 'tools/apply_scene_v17_618.py'
-      - 'tools/apply_scene_v17_619.py'
-      - 'tools/apply_scene_v17_620.py'
-      - 'tools/apply_scene_v17_621.py'
-      - 'tools/apply_scene_v17_622.py'
-      - 'tools/apply_scene_v17_623.py'
-      - 'tools/apply_scene_v17_624.py'
-      - 'tools/apply_scene_v17_625.py'
-      - 'tools/apply_scene_v17_626.py'
-      - 'tools/apply_scene_v17_627.py'
-      - 'tools/apply_scene_v17_628.py'
-      - 'tools/apply_scene_v17_629.py'
-      - 'assets/camion_icecream.obj'
-      - 'assets/camion_icecream.mtl'
-      - 'assets/camion-glaces-side-v625.jpg'
-      - '.github/workflows/publish-scene.yml'
   workflow_dispatch:
 
 permissions:
@@ -63,7 +32,7 @@ jobs:
           tag_name: ${{ steps.package.outputs.tag }}
           name: V17 scene ${{ steps.package.outputs.revision }} — build ${{ github.run_number }}
           target_commitish: ${{ github.sha }}
-          make_latest: true
+          make_latest: false
           generate_release_notes: true
           files: |
             dist/V17-scene.zip

@@ -6,9 +6,9 @@ Ce dépôt contient les données de la scène civique de référence de V17 : g�
 
 ## Révision publiée
 
-La scène préparée est **V17.629**, à partir de V17.628. Elle retire les deux anciennes cloisons opaques des douches (`v17_001776` et `v17_001777`). La mosaïque de verre translucide aqua, turquoise et bleu profond avec touches champagne reste appliquée aux deux pans du mur en L des vestiaires (`v17_001771` et `v17_001773`), conformément au design validé. Les corrections du camion V17.627–V17.628 et le contrôle des références PBR sont conservés. La scène part de l’archive **V17.605** et applique les correctifs versionnés dans `tools/`.
+La scène principale est **V17.631** (géométrie V17.629 conservée), avec politique optique intégrée, BVH précalculé et index Z Reflect schema 2. Les cinq plans optiques comprennent l’eau et quatre plans vitrés ; les vitres de l’ascenseur sont exclues des caméras planaires. Les 29 vues de référence ont été contrôlées. La release existante `scene-reflect-V17.631` est promue sans changer son archive ni ses empreintes SHA256.
 
-Le fichier racine `SCENE_VERSION.json` identifie l’archive source épinglée V17.605. Le manifeste de publication `scene-release.json` identifie la révision produite ; le workflow génère le manifeste de sortie de la révision publiée et le place dans l’archive. Pour le moteur et les utilisateurs, le manifeste inclus dans l’asset de release est la référence de la scène livrée.
+Le fichier racine `SCENE_VERSION.json` identifie l’archive source épinglée V17.605. Le manifeste `scene-release.json` identifie la base V17.629 ; `reflect-release.json` définit la révision principale avec caches optiques ; le workflow génère le manifeste de sortie de la révision publiée et le place dans l’archive. Pour le moteur et les utilisateurs, le manifeste inclus dans l’asset de release est la référence de la scène livrée.
 
 ## Télécharger et intégrer
 
@@ -17,7 +17,7 @@ La release contient `V17-scene.zip` et son manifeste `SCENE_VERSION.json`. Les l
 - [Archive de la scène publiée](https://github.com/glaby91/moteur3d-scene/releases/latest/download/V17-scene.zip)
 - [Manifeste de la scène publiée](https://github.com/glaby91/moteur3d-scene/releases/latest/download/SCENE_VERSION.json)
 
-Le dépôt moteur [CSE WARP](https://github.com/glaby91/moteur3d) récupère la dernière release au moment de la compilation, valide son manifeste et son chargement, puis l’intègre au package Windows autonome. Le build officiel [V17.003 #587](https://github.com/glaby91/moteur3d/actions/runs/45080722276) a livré la scène V17.613.
+Le dépôt moteur [CSE WARP](https://github.com/glaby91/moteur3d) valide la scène de référence séparément. Le moteur télécharge la scène publiée au démarrage si nécessaire ; son package Windows ne contient pas l’archive de scène. Le build officiel [V17.003 #587](https://github.com/glaby91/moteur3d/actions/runs/45080722276) a livré la scène V17.613.
 
 ## Scène historique de Pripiat — place centrale
 
@@ -27,4 +27,4 @@ Un package autonome de données est également disponible pour la **scène centr
 
 ## Faire évoluer la scène
 
-Les fichiers de correction versionnés dans `tools/` produisent la scène publiée depuis l’archive de base. Chaque commit concerné poussé sur `main` lance le workflow de publication, qui valide l’archive et met à disposition une nouvelle release sans compiler le moteur.
+Les fichiers de correction versionnés dans `tools/` produisent la scène publiée depuis l’archive de base. Le workflow principal `publish-reflect-scene.yml` publie les révisions optiques depuis `main`. Pour une modification de scène, incrémenter la révision, adapter la politique et épingler le compilateur. Le workflow historique est manuel et ne désigne plus une ancienne scène comme latest.
