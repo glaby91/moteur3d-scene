@@ -28,3 +28,6 @@ Un package autonome de données est également disponible pour la **scène centr
 ## Faire évoluer la scène
 
 Les fichiers de correction versionnés dans `tools/` produisent la scène publiée depuis l’archive de base. Le workflow principal `publish-reflect-scene.yml` publie les révisions optiques depuis `main`. Pour une modification de scène, incrémenter la révision, adapter la politique et épingler le compilateur. Le workflow historique est manuel et ne désigne plus une ancienne scène comme latest.
+
+### V17.632 — nettoyage ciblé (27 novembre 2026)
+Suppression des deux cloisons de mosaïque de verre, des cinq douches et de la dalle résiduelle de l'ancienne trémie du hall. Voir [rapport et périmètre](docs/V17.632-nettoyage.md). La publication reste conditionnée au workflow natif ; V17.631 conservée comme version de retour.
