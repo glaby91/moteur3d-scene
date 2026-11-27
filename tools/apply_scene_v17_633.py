@@ -105,18 +105,18 @@ def apply_patch(scene):
     cells=[(a,b,c,d) for a,b in zip(xs,xs[1:]) for c,d in zip(zs,zs[1:]) if covered((a+b)/2,(c+d)/2)]
     area=sum((b-a)*(d-c) for a,b,c,d in cells)
     need(near(area,22*50.325-3.1*2.56+57*9.525),'Unexpected floor area')
-    top=9.1765;bottom=8.85
+    top=9.1765;bottom=8.85;finish=top-9.15
     skin=mesh('geo_v633_floor_surface')
     for i,(a,b,c,d) in enumerate(rects):
         # Solid source boxes retain existing walkable geometry and BVH behavior.
-        add('v633_floor_structure_%02d'%i,parent,'prp_concrete_raw',[(a+b)/2,(bottom+top-.025)/2,(c+d)/2],[b-a,top-.025-bottom,d-c])
+        add('v633_floor_structure_%02d'%i,parent,'prp_concrete_raw',[(a+b)/2,(bottom+9.15)/2,(c+d)/2],[b-a,9.15-bottom,d-c])
     for a,b,c,d in cells:
         points=[[a,top,c],[a,top,d],[b,top,d],[b,top,c]]
         quad(skin,points,[[p[0]*.5,p[2]*.5] for p in points])
         # Finish edge only on exterior boundaries, never between cells.
         for p,q,ox,oz in [([a,top,c],[b,top,c],0,-1),([b,top,c],[b,top,d],1,0),([b,top,d],[a,top,d],0,1),([a,top,d],[a,top,c],-1,0)]:
             if not covered((p[0]+q[0])/2+ox*.001,(p[2]+q[2])/2+oz*.001):
-                quad(skin,[q,p,[p[0],top-.025,p[2]],[q[0],top-.025,q[2]]],[[0,1],[1,1],[1,0],[0,0]])
+                quad(skin,[p,q,[q[0],top-finish,q[2]],[p[0],top-finish,p[2]]],[[0,1],[1,1],[1,0],[0,0]])
     meshes.append(skin)
     add('v633_floor_surface',parent,'v439_gallery_warm',[0,0,0],[1,1,1],skin['id'])
     # 4: extend the shaft's fixed envelope, not the mobile cabin nor doors.
@@ -199,7 +199,7 @@ def apply_patch(scene):
                 # tile, no opaque substrate and no redundant stacked layers.
                 a=z-w/2+col*w/cols+.0015;b=z-w/2+(col+1)*w/cols-.0015
                 c=lo+.07+row*h/rows+.0015;d=lo+.07+(row+1)*h/rows-.0015
-                quad(m,[[x,c,a],[x,d,a],[x,d,b],[x,c,b]],[[0,0],[0,1],[1,1],[1,0]])
+                quad(m,[[x,c,b],[x,d,b],[x,d,a],[x,c,a]],[[1,0],[1,1],[0,1],[0,0]])
         for name,m in groups.items():
             if not m['faces']:continue
             meshes.append(m);add(prefix+name,panel_parent,'v633_mosaic_'+name,[0,0,0],[1,1,1],m['id'])
